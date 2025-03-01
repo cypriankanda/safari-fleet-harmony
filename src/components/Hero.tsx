@@ -1,12 +1,19 @@
 
 import { ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  
   const scrollToVehicles = () => {
     const vehiclesSection = document.getElementById('vehicles');
     if (vehiclesSection) {
       vehiclesSection.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const handleBookNow = () => {
+    navigate('/vehicles');
   };
 
   return (
@@ -35,9 +42,9 @@ const Hero = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4">
-            <a href="#book-now" className="btn-secondary inline-block text-center animate-fade-up">
+            <button onClick={handleBookNow} className="btn-secondary inline-block text-center animate-fade-up">
               Book Now
-            </a>
+            </button>
             <a href="#vehicles" className="btn-outline border-white text-white hover:bg-white hover:text-primary inline-block text-center animate-fade-up" onClick={(e) => { e.preventDefault(); scrollToVehicles(); }}>
               View Our Fleet
             </a>

@@ -1,125 +1,74 @@
 
-import { useState } from 'react';
-import { ChevronRight, Users, Calendar, Fuel, ArrowRight, Check } from 'lucide-react';
-import type { Vehicle } from '../data/vehicles';
+import { Vehicle } from "@/data/vehicles";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Users, Fuel, Settings } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
-  featured?: boolean;
 }
 
-const VehicleCard = ({ vehicle, featured = false }: VehicleCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-KE', {
-      style: 'currency',
-      currency: 'KES',
-      maximumFractionDigits: 0,
-    }).format(price);
+const VehicleCard = ({ vehicle }: VehicleCardProps) => {
+  const navigate = useNavigate();
+
+  const handleBookNow = () => {
+    navigate(`/booking/${vehicle.id}`);
   };
-  
+
   return (
-    <div 
-      className={`safari-card overflow-hidden ${featured ? 'group' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {/* Image Container */}
-      <div className="relative overflow-hidden h-56">
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group">
+      <div className="relative overflow-hidden">
         <img 
           src={vehicle.image} 
           alt={`${vehicle.name} ${vehicle.model}`}
-          className={`w-full h-full object-cover object-center transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
+          className="w-full h-44 object-cover transform group-hover:scale-105 transition-transform duration-500"
         />
-        
-        {/* Vehicle Type Badge */}
-        <div className="absolute top-4 left-4 bg-secondary/90 text-white text-sm font-medium px-3 py-1 rounded-full">
-          {vehicle.type}
-        </div>
-        
-        {/* Availability Badge */}
-        {!vehicle.available && (
-          <div className="absolute top-4 right-4 bg-charcoal/80 text-white text-sm font-medium px-3 py-1 rounded-full">
-            Currently Booked
-          </div>
-        )}
-        
-        {/* Price Tag */}
-        <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm text-charcoal font-montserrat font-bold px-4 py-2 rounded-lg shadow-md">
-          <div className="text-xs uppercase opacity-70">Per Day</div>
-          <div className="text-lg">{formatPrice(vehicle.pricePerDay)}</div>
+        <div className="absolute top-3 right-3">
+          <Badge variant="outline" className={`${vehicle.available ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+            {vehicle.available ? 'Available' : 'Unavailable'}
+          </Badge>
         </div>
       </div>
       
-      {/* Content */}
-      <div className="p-6">
-        <h3 className="text-xl font-bold font-montserrat mb-2 flex items-center justify-between">
-          <span>{vehicle.name} {vehicle.model}</span>
-          {featured && <ChevronRight className="w-5 h-5 text-secondary opacity-0 group-hover:opacity-100 transition-opacity" />}
-        </h3>
+      <div className="p-4">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-bold">{vehicle.name}</h3>
+          <span className="text-xl font-semibold text-primary">
+            KES {vehicle.pricePerDay.toLocaleString()}
+            <span className="text-xs text-gray-500">/day</span>
+          </span>
+        </div>
         
-        {/* Features */}
-        <div className="flex flex-wrap gap-y-3 mb-4">
-          <div className="w-1/2 flex items-center text-sm text-charcoal-light">
-            <Users className="mr-2 w-4 h-4 text-primary" />
-            <span>{vehicle.seats} Seats</span>
+        <p className="text-sm text-gray-500 mb-3">{vehicle.model} • {vehicle.year}</p>
+        
+        <div className="grid grid-cols-2 gap-2 text-xs mb-4">
+          <div className="flex items-center">
+            <Users className="w-3.5 h-3.5 text-gray-400 mr-1.5" />
+            <span>{vehicle.seats} Passengers</span>
           </div>
-          <div className="w-1/2 flex items-center text-sm text-charcoal-light">
-            <Calendar className="mr-2 w-4 h-4 text-primary" />
-            <span>{vehicle.year}</span>
-          </div>
-          <div className="w-1/2 flex items-center text-sm text-charcoal-light">
-            <Fuel className="mr-2 w-4 h-4 text-primary" />
-            <span>{vehicle.fuelType}</span>
-          </div>
-          <div className="w-1/2 flex items-center text-sm text-charcoal-light">
-            <svg className="mr-2 w-4 h-4 text-primary fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10.5 13.707l-2.707-2.707-1.414 1.414 4.121 4.121 8.5-8.5-1.414-1.414z" />
-            </svg>
+          <div className="flex items-center">
+            <Settings className="w-3.5 h-3.5 text-gray-400 mr-1.5" />
             <span>{vehicle.transmission}</span>
           </div>
-        </div>
-        
-        {/* Key Features */}
-        {featured && (
-          <div className="mb-4">
-            <div className="text-sm font-semibold text-charcoal mb-2">Key Features:</div>
-            <div className="grid grid-cols-2 gap-y-1 gap-x-2">
-              {vehicle.features.slice(0, 4).map((feature, index) => (
-                <div key={index} className="flex items-center text-xs text-charcoal-lighter">
-                  <Check className="mr-1 w-3 h-3 text-primary flex-shrink-0" />
-                  <span className="truncate">{feature}</span>
-                </div>
-              ))}
-            </div>
+          <div className="flex items-center">
+            <Fuel className="w-3.5 h-3.5 text-gray-400 mr-1.5" />
+            <span>{vehicle.fuelType}</span>
           </div>
-        )}
-        
-        {/* CTA */}
-        <div className={`flex ${featured ? 'justify-between' : 'justify-end'} items-center mt-4`}>
-          {featured && (
-            <div className="text-sm font-semibold text-charcoal">
-              {vehicle.available ? (
-                <span className="text-primary">Available Now</span>
-              ) : (
-                <span className="text-charcoal-light">Currently Booked</span>
-              )}
-            </div>
-          )}
-          
-          <a
-            href="#"
-            className={`
-              inline-flex items-center text-sm font-semibold 
-              ${vehicle.available ? 'text-secondary hover:text-secondary-600' : 'text-charcoal-light cursor-not-allowed'} 
-              transition-colors
-            `}
-          >
-            {vehicle.available ? 'View Details' : 'Check Later'}
-            <ArrowRight className="ml-1 w-4 h-4" />
-          </a>
+          <div className="flex items-center">
+            <Calendar className="w-3.5 h-3.5 text-gray-400 mr-1.5" />
+            <span>{vehicle.type}</span>
+          </div>
         </div>
+        
+        <Button 
+          onClick={handleBookNow}
+          className="w-full" 
+          variant={vehicle.available ? "default" : "outline"}
+          disabled={!vehicle.available}
+        >
+          {vehicle.available ? 'Book Now' : 'Currently Unavailable'}
+        </Button>
       </div>
     </div>
   );
