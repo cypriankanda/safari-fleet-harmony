@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -54,6 +55,7 @@ const Navbar = () => {
               </div>
             </div>
             
+            <Link to="/admin" className="btn-secondary">Admin Dashboard</Link>
             <a href="#book-now" className="btn-primary">Book Now</a>
           </div>
           
@@ -81,6 +83,7 @@ const Navbar = () => {
               <a href="#contact" className="text-charcoal hover:text-primary font-medium transition-colors">Contact</a>
               <a href="#" className="text-charcoal hover:text-primary font-medium transition-colors">Sign In</a>
               <a href="#" className="text-charcoal hover:text-primary font-medium transition-colors">Register</a>
+              <Link to="/admin" className="text-charcoal hover:text-primary font-medium transition-colors">Admin Dashboard</Link>
               <a href="#book-now" className="btn-primary inline-block text-center">Book Now</a>
             </div>
           </div>
