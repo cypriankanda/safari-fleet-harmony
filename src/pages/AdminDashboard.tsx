@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -31,12 +30,11 @@ import {
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { CalendarRange, Car, Users, DollarSign, Map, PlusCircle, Search } from "lucide-react";
+import { CalendarRange, Car, Users, DollarSign, Map, PlusCircle, Search, CheckCircle2, XCircle } from "lucide-react";
 import drivers from "@/data/drivers";
 import vehicles from "@/data/vehicles";
 import { Driver } from "@/data/drivers";
 
-// Mock booking data
 const mockBookings = [
   {
     id: "B12345",
@@ -90,6 +88,8 @@ const AdminDashboard = () => {
   const [assignDriver, setAssignDriver] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showDialog, setShowDialog] = useState(false);
+  const [vehicleSearchTerm, setVehicleSearchTerm] = useState("");
+  const [driverSearchTerm, setDriverSearchTerm] = useState("");
 
   const filteredBookings = bookings.filter(booking => 
     booking.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -190,6 +190,32 @@ const AdminDashboard = () => {
   };
 
   const availableDrivers = drivers.filter(driver => driver.available);
+
+  const filteredVehicles = vehicles.filter(vehicle => 
+    vehicle.name.toLowerCase().includes(vehicleSearchTerm.toLowerCase()) ||
+    vehicle.model.toLowerCase().includes(vehicleSearchTerm.toLowerCase()) ||
+    vehicle.type.toLowerCase().includes(vehicleSearchTerm.toLowerCase())
+  );
+
+  const filteredDrivers = drivers.filter(driver => 
+    driver.name.toLowerCase().includes(driverSearchTerm.toLowerCase()) ||
+    driver.phone.toLowerCase().includes(driverSearchTerm.toLowerCase()) ||
+    driver.license.toLowerCase().includes(driverSearchTerm.toLowerCase())
+  );
+
+  const toggleDriverAvailability = (driverId: string) => {
+    toast({
+      title: "Driver Status Updated",
+      description: "Driver availability has been toggled.",
+    });
+  };
+
+  const toggleVehicleAvailability = (vehicleId: number) => {
+    toast({
+      title: "Vehicle Status Updated",
+      description: "Vehicle availability has been toggled.",
+    });
+  };
 
   return (
     <div className="min-h-screen pt-20 pb-12 bg-slate-50">
@@ -356,26 +382,199 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="vehicles">
+          <TabsContent value="vehicles" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="relative w-64">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search vehicles..."
+                  className="pl-8" 
+                  value={vehicleSearchTerm}
+                  onChange={(e) => setVehicleSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Vehicle
+              </Button>
+            </div>
+            
             <Card>
               <CardHeader>
                 <CardTitle>Vehicle Fleet</CardTitle>
                 <CardDescription>Manage your vehicles and availability</CardDescription>
               </CardHeader>
-              <CardContent>
-                <p>Vehicle management interface will be implemented here.</p>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Image</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Price/Day</TableHead>
+                      <TableHead>Transmission</TableHead>
+                      <TableHead>Year</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredVehicles.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center">No vehicles found</TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredVehicles.map((vehicle) => (
+                        <TableRow key={vehicle.id}>
+                          <TableCell>
+                            <img 
+                              src={vehicle.image} 
+                              alt={vehicle.name} 
+                              className="w-12 h-12 object-cover rounded"
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {vehicle.name} {vehicle.model}
+                          </TableCell>
+                          <TableCell>{vehicle.type}</TableCell>
+                          <TableCell>KES {vehicle.pricePerDay.toLocaleString()}</TableCell>
+                          <TableCell>{vehicle.transmission}</TableCell>
+                          <TableCell>{vehicle.year}</TableCell>
+                          <TableCell>
+                            {vehicle.available ? (
+                              <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Available</Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Unavailable</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-8"
+                                onClick={() => toggleVehicleAvailability(vehicle.id)}
+                              >
+                                {vehicle.available ? (
+                                  <XCircle className="mr-1 h-4 w-4 text-red-500" />
+                                ) : (
+                                  <CheckCircle2 className="mr-1 h-4 w-4 text-green-500" />
+                                )}
+                                {vehicle.available ? "Mark Unavailable" : "Mark Available"}
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-8"
+                              >
+                                Edit
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
           
-          <TabsContent value="drivers">
+          <TabsContent value="drivers" className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="relative w-64">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search drivers..."
+                  className="pl-8" 
+                  value={driverSearchTerm}
+                  onChange={(e) => setDriverSearchTerm(e.target.value)}
+                />
+              </div>
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Driver
+              </Button>
+            </div>
+            
             <Card>
               <CardHeader>
                 <CardTitle>Driver Management</CardTitle>
                 <CardDescription>Manage your drivers and assignments</CardDescription>
               </CardHeader>
-              <CardContent>
-                <p>Driver management interface will be implemented here.</p>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Photo</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>License</TableHead>
+                      <TableHead>Rating</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {filteredDrivers.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center">No drivers found</TableCell>
+                      </TableRow>
+                    ) : (
+                      filteredDrivers.map((driver) => (
+                        <TableRow key={driver.id}>
+                          <TableCell>
+                            <img 
+                              src={driver.image} 
+                              alt={driver.name} 
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          </TableCell>
+                          <TableCell className="font-medium">{driver.name}</TableCell>
+                          <TableCell>{driver.phone}</TableCell>
+                          <TableCell>{driver.license}</TableCell>
+                          <TableCell>
+                            <div className="flex items-center">
+                              <span className="text-yellow-500 mr-1">★</span>
+                              {driver.rating}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {driver.available ? (
+                              <Badge variant="outline" className="bg-green-100 text-green-800 hover:bg-green-100">Available</Badge>
+                            ) : (
+                              <Badge variant="outline" className="bg-red-100 text-red-800 hover:bg-red-100">Unavailable</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-8"
+                                onClick={() => toggleDriverAvailability(driver.id)}
+                              >
+                                {driver.available ? (
+                                  <XCircle className="mr-1 h-4 w-4 text-red-500" />
+                                ) : (
+                                  <CheckCircle2 className="mr-1 h-4 w-4 text-green-500" />
+                                )}
+                                {driver.available ? "Mark Unavailable" : "Mark Available"}
+                              </Button>
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="h-8"
+                              >
+                                Edit
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
               </CardContent>
             </Card>
           </TabsContent>
