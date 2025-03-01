@@ -137,6 +137,15 @@ const AdminDashboard = () => {
   const handleApproveBooking = () => {
     if (!selectedBooking) return;
     
+    if (selectedBooking.withDriver && !assignDriver) {
+      toast({
+        title: "Error",
+        description: "Please assign a driver to this booking.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     const updatedBookings = bookings.map(booking => {
       if (booking.id === selectedBooking.id) {
         return { 
@@ -153,7 +162,7 @@ const AdminDashboard = () => {
     
     toast({
       title: "Booking Approved",
-      description: `Booking ${selectedBooking.id} has been approved successfully.`,
+      description: `Booking ${selectedBooking.id} has been approved successfully${selectedBooking.withDriver ? ` with driver ${getDriverDetails(assignDriver)}` : ''}.`,
     });
   };
 
@@ -334,7 +343,24 @@ const AdminDashboard = () => {
                               <div>To: {formatDate(booking.endDate)}</div>
                             </div>
                           </TableCell>
-                          <TableCell>{booking.withDriver ? getDriverDetails(booking.driverId) : "Self-Drive"}</TableCell>
+                          <TableCell>
+                            {booking.withDriver ? (
+                              <div>
+                                {booking.driverId ? (
+                                  <div className="flex items-center">
+                                    <span className="font-medium">{getDriverDetails(booking.driverId)}</span>
+                                    <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-100">Assigned</Badge>
+                                  </div>
+                                ) : (
+                                  <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                                    Driver Requested
+                                  </Badge>
+                                )}
+                              </div>
+                            ) : (
+                              "Self-Drive"
+                            )}
+                          </TableCell>
                           <TableCell>{getStatusBadge(booking.status)}</TableCell>
                           <TableCell>KES {booking.totalAmount.toLocaleString()}</TableCell>
                           <TableCell className="text-right">
@@ -630,24 +656,31 @@ const AdminDashboard = () => {
               </div>
               
               {selectedBooking.withDriver && (
-                <div>
-                  <Label htmlFor="driver-select">Assign Driver</Label>
-                  <Select value={assignDriver} onValueChange={setAssignDriver}>
-                    <SelectTrigger id="driver-select">
-                      <SelectValue placeholder="Select a driver" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availableDrivers.length === 0 ? (
-                        <SelectItem value="none" disabled>No drivers available</SelectItem>
-                      ) : (
-                        availableDrivers.map((driver: Driver) => (
-                          <SelectItem key={driver.id} value={driver.id}>
-                            {driver.name}
-                          </SelectItem>
-                        ))
-                      )}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-1.5">
+                  <Label htmlFor="driver-select" className="text-sm font-medium">
+                    Assign Driver <span className="text-red-500">*</span>
+                  </Label>
+                  <div>
+                    <Select value={assignDriver} onValueChange={setAssignDriver}>
+                      <SelectTrigger id="driver-select" className={!assignDriver ? "border-red-300" : ""}>
+                        <SelectValue placeholder="Select a driver" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableDrivers.length === 0 ? (
+                          <SelectItem value="none" disabled>No drivers available</SelectItem>
+                        ) : (
+                          availableDrivers.map((driver: Driver) => (
+                            <SelectItem key={driver.id} value={driver.id}>
+                              {driver.name} - Rating: {driver.rating}
+                            </SelectItem>
+                          ))
+                        )}
+                      </SelectContent>
+                    </Select>
+                    {selectedBooking.withDriver && !assignDriver && (
+                      <p className="text-xs text-red-500 mt-1">Driver assignment is required</p>
+                    )}
+                  </div>
                 </div>
               )}
               
