@@ -7,9 +7,10 @@ import { useNavigate } from "react-router-dom";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
+  featured?: boolean;
 }
 
-const VehicleCard = ({ vehicle }: VehicleCardProps) => {
+const VehicleCard = ({ vehicle, featured }: VehicleCardProps) => {
   const navigate = useNavigate();
 
   const handleBookNow = () => {
