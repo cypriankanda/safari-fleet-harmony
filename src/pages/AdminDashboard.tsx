@@ -1,4 +1,4 @@
-<lov-code>
+
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -840,3 +840,334 @@ const AdminDashboard = () => {
                               </div>
                             </TableCell>
                             <TableCell>
+                              <Badge
+                                variant="outline"
+                                className={driver.available ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                              >
+                                {driver.available ? "Available" : "Unavailable"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="hover:bg-blue-50"
+                                  onClick={() => handleViewDriverProfile(driver)}
+                                >
+                                  View
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="hover:bg-amber-50"
+                                  onClick={() => handleEditDriver(driver)}
+                                >
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className={driver.available ? "hover:bg-red-50" : "hover:bg-green-50"}
+                                  onClick={() => toggleAvailability("driver", driver.id)}
+                                >
+                                  {driver.available ? "Mark Busy" : "Mark Available"}
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Map Tab */}
+          <TabsContent value="map">
+            <Card className="shadow-md overflow-hidden border-0">
+              <CardHeader className="bg-gray-50 border-b">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle className="text-xl">Live Vehicle Tracking</CardTitle>
+                    <CardDescription>Track your vehicles in real-time</CardDescription>
+                  </div>
+                  <Button variant="outline">
+                    <RefreshCw className="mr-2 h-4 w-4" />
+                    Refresh Locations
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="bg-gray-100 h-96 flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <Map className="w-12 h-12 mb-4 mx-auto text-gray-400" />
+                    <h3 className="text-lg font-medium text-gray-800 mb-2">GPS Tracking Coming Soon</h3>
+                    <p className="text-gray-500 max-w-lg">
+                      Our live GPS tracking feature is currently in development and will be available soon. 
+                      This will allow you to monitor all vehicles in real-time with detailed location data.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Chat Bot */}
+        <ChatBot />
+
+        {/* Assign Driver Dialog */}
+        <Dialog open={assignDriverDialog} onOpenChange={setAssignDriverDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Assign Driver to Booking</DialogTitle>
+              <DialogDescription>
+                Select a driver to assign to booking #{selectedBooking?.id}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              {availableDrivers.length === 0 ? (
+                <div className="text-center p-4 bg-gray-50 rounded border">
+                  <Users className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                  <p className="text-gray-500">No available drivers found</p>
+                  <p className="text-sm text-gray-400">All drivers are currently assigned or unavailable</p>
+                </div>
+              ) : (
+                availableDrivers.map((driver) => (
+                  <div 
+                    key={driver.id} 
+                    className="flex items-center p-3 border rounded hover:bg-gray-50 cursor-pointer"
+                    onClick={() => handleAssignDriver(driver.id)}
+                  >
+                    <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-100 mr-3">
+                      <img
+                        src={driver.avatar}
+                        alt={`${driver.name}'s avatar`}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{driver.name}</p>
+                      <div className="flex items-center text-sm text-gray-500">
+                        <span>{driver.rating}</span>
+                        <Sparkles className="h-3 w-3 text-yellow-500 ml-1 mr-2" />
+                        <span>{driver.totalTrips} trips</span>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="outline">Assign</Button>
+                  </div>
+                ))
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setAssignDriverDialog(false)}>
+                Cancel
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Driver Dialog */}
+        <Dialog open={editDriverDialog} onOpenChange={setEditDriverDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Driver</DialogTitle>
+              <DialogDescription>
+                Update driver details below
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="name">Name</Label>
+                <Input
+                  id="name"
+                  value={editedDriver.name || ""}
+                  onChange={(e) => setEditedDriver({ ...editedDriver, name: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="phone">Phone</Label>
+                <Input
+                  id="phone"
+                  value={editedDriver.phone || ""}
+                  onChange={(e) => setEditedDriver({ ...editedDriver, phone: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="license">License Number</Label>
+                <Input
+                  id="license"
+                  value={editedDriver.license || ""}
+                  onChange={(e) => setEditedDriver({ ...editedDriver, license: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={editedDriver.email || ""}
+                  onChange={(e) => setEditedDriver({ ...editedDriver, email: e.target.value })}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditDriverDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveDriver}>Save Changes</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Add New Driver Dialog */}
+        <Dialog open={addDriverDialog} onOpenChange={setAddDriverDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Driver</DialogTitle>
+              <DialogDescription>
+                Enter driver details below to add a new driver
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="newName">Name</Label>
+                <Input
+                  id="newName"
+                  value={newDriver.name || ""}
+                  onChange={(e) => setNewDriver({ ...newDriver, name: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="newPhone">Phone</Label>
+                <Input
+                  id="newPhone"
+                  value={newDriver.phone || ""}
+                  onChange={(e) => setNewDriver({ ...newDriver, phone: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="newLicense">License Number</Label>
+                <Input
+                  id="newLicense"
+                  value={newDriver.license || ""}
+                  onChange={(e) => setNewDriver({ ...newDriver, license: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="newEmail">Email</Label>
+                <Input
+                  id="newEmail"
+                  type="email"
+                  value={newDriver.email || ""}
+                  onChange={(e) => setNewDriver({ ...newDriver, email: e.target.value })}
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="newAvatar">Avatar URL</Label>
+                <Input
+                  id="newAvatar"
+                  value={newDriver.avatar || ""}
+                  onChange={(e) => setNewDriver({ ...newDriver, avatar: e.target.value })}
+                  placeholder="https://example.com/avatar.jpg"
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setAddDriverDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveNewDriver}>Add Driver</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* View Driver Profile Dialog */}
+        <Dialog open={viewDriverProfileDialog} onOpenChange={setViewDriverProfileDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Driver Profile</DialogTitle>
+            </DialogHeader>
+            {selectedDriver && (
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="h-16 w-16 rounded-full overflow-hidden bg-gray-100">
+                    <img
+                      src={selectedDriver.avatar}
+                      alt={`${selectedDriver.name}'s avatar`}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold">{selectedDriver.name}</h3>
+                    <div className="flex items-center text-sm text-gray-500">
+                      <span>{selectedDriver.rating}</span>
+                      <Sparkles className="h-3.5 w-3.5 text-yellow-500 ml-1 mr-2" />
+                      <span>{selectedDriver.totalTrips} trips</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-gray-500">Phone</p>
+                    <p className="font-medium">{selectedDriver.phone}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Email</p>
+                    <p className="font-medium">{selectedDriver.email || "N/A"}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">License</p>
+                    <p className="font-medium">{selectedDriver.license}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Status</p>
+                    <p className="font-medium capitalize">{selectedDriver.status}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Hire Date</p>
+                    <p className="font-medium">{new Date(selectedDriver.hireDate).toLocaleDateString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-gray-500">Last Active</p>
+                    <p className="font-medium">{new Date(selectedDriver.lastActive).toLocaleDateString()}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <Badge
+                    variant="outline"
+                    className={selectedDriver.available ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
+                  >
+                    {selectedDriver.available ? "Available" : "Unavailable"}
+                  </Badge>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setViewDriverProfileDialog(false)}>
+                Close
+              </Button>
+              <Button 
+                variant="outline" 
+                className="hover:bg-amber-50"
+                onClick={() => {
+                  setViewDriverProfileDialog(false);
+                  handleEditDriver(selectedDriver!);
+                }}
+              >
+                Edit Driver
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
