@@ -1,7 +1,9 @@
+
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import vehicles from "../data/vehicles";
 import VehicleCard from "./VehicleCard";
+import { Link } from "react-router-dom";
 
 const FeaturedVehicles = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -103,10 +105,10 @@ const FeaturedVehicles = () => {
           ))}
         </div>
 
-        {/* View All Button */}
+        {/* View All Button - Updated to scroll to catalog section */}
         <div className="text-center mt-12">
           <a
-            href="#"
+            href="#catalog"
             className="btn-outline inline-flex items-center px-6 py-3 text-lg font-medium rounded-lg hover:bg-primary hover:text-white transition-colors"
           >
             View All Vehicles <ChevronRight className="ml-2 w-5 h-5" />

@@ -12,11 +12,20 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
+// Custom event to trigger admin login dialog
+const triggerAdminLogin = () => {
+  const event = new Event('admin-login-request');
+  window.dispatchEvent(event);
+};
+
+// Attach the function to the window object so it can be accessed globally
+(window as any).triggerAdminLogin = triggerAdminLogin;
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <Sonner position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

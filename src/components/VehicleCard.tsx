@@ -18,13 +18,24 @@ const VehicleCard = ({ vehicle, featured, className }: VehicleCardProps) => {
     navigate(`/booking/${vehicle.id}`);
   };
 
+  // Use a different image format that will work with real car images
+  const getImageUrl = () => {
+    // If the image starts with http, it's already a full URL
+    if (vehicle.image.startsWith('http')) {
+      return vehicle.image;
+    }
+    
+    // Otherwise, it's a local path
+    return vehicle.image;
+  };
+
   return (
     <div
       className={`bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden group ${className}`}
     >
       <div className="relative overflow-hidden">
         <img
-          src={vehicle.image}
+          src={getImageUrl()}
           alt={`${vehicle.name} ${vehicle.model}`}
           className="w-full h-44 object-cover transform group-hover:scale-105 transition-transform duration-500"
         />
