@@ -1,5 +1,4 @@
 
-// AdminDashboard.tsx
 import { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -618,7 +617,9 @@ const AdminDashboard = () => {
                                 "No Driver"
                               )}
                             </TableCell>
-                            <TableCell>{getStatusBadge(booking.status)}</TableCell>
+                            <TableCell>
+                              {getStatusBadge(booking.status)}
+                            </TableCell>
                             <TableCell className="font-medium">KES {booking.totalAmount.toLocaleString()}</TableCell>
                             <TableCell className="text-right">
                               {booking.status === "pending" && (
@@ -1171,11 +1172,10 @@ const AdminDashboard = () => {
         </DialogContent>
       </Dialog>
       
-      {/* Chatbot Component */}
+      {/* Add the ChatBot component without additional className */}
       <ChatBot />
     </div>
   );
 };
 
 export default AdminDashboard;
-
