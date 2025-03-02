@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import BookingPage from "./pages/BookingPage";
 import BookingSuccess from "./pages/BookingSuccess";
 import AdminDashboard from "./pages/AdminDashboard";
+import ChatBot from "./components/ChatBot";
 
 const queryClient = new QueryClient();
 
