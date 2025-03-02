@@ -1,6 +1,9 @@
 # Welcome to your PSK Safaris Website Project
 
 ## Project info
+![image](https://github.com/user-attachments/assets/51efdca4-41c1-4239-9a59-cc0924dc5e24)
+
+
 PSK stands for "Premier Safari Kenya," reflecting the core purpose of the PSK Safaris Website. 
 This project is a fleet management application designed to enhance the operations of safari and rental services in Kenya. Built with modern technologies like Vite, TypeScript, React, shadcn-ui, and Tailwind CSS, 
 it provides an intuitive admin dashboard to manage vehicles, drivers, and bookings efficiently.
